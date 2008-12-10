@@ -17,6 +17,28 @@ class TestHelipad < Test::Unit::TestCase
     end
   end
   
+  def test_create
+    assert_nothing_raised do
+      response = @hp.create("New document", "test", "Just a test document")
+      doc = Document.new response
+      created = doc.root.elements["saved"].text
+      assert_equal("true", created, "Document not created.")
+      @hp.destroy(doc.root.elements["id"].text) if created = "true"
+    end
+  end
+  
+  def test_destroy
+    create_response = @hp.create("Document for deletion", "test", "Should be deleted by test case")
+    create_doc = Document.new create_response
+    id = create_doc.root.elements["id"].text
+    assert_nothing_raised do
+      response = @hp.destroy(id)
+      doc = Document.new response
+      deleted = doc.root.text
+      assert_equal("true", deleted, "Document not deleted.")
+    end
+  end
+
   def test_get
     assert_nothing_raised do
       @hp.get(1)
@@ -36,25 +58,4 @@ class TestHelipad < Test::Unit::TestCase
 
   end
 
-  def test_create
-    assert_nothing_raised do
-      response = @hp.create("New document", "test", "Just a test document")
-      doc = Document.new response
-      created = doc.root.elements["saved"].text
-      assert_equal("true", created, "Document not created.")
-      @hp.destroy(doc.root.elements["id"].text) if created = "true"
-    end
-  end
-  
-  def test_destroy
-    response = @hp.create("Document for deletion", "test", "Should be deleted by test case")
-    doc = Document.new response
-    id = doc.root.elements["id"].text
-    assert_nothing_raised do
-      response = @hp.destroy(id)
-      doc = Document.new response
-      deleted = doc.root.elements["deleted"].text
-      assert_equal("true", deleted, "Document not deleted.")
-    end
-  end
 end
