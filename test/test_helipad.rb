@@ -52,10 +52,42 @@ class TestHelipad < Test::Unit::TestCase
   
   def test_get_html
     assert_nothing_raised do
-      @hp.get_html(1)
+      doc = Document.new @hp.get_html(1)
     end
-    doc = Document.new @hp.get_html(1)
-
   end
 
+  def test_update
+    create_response = @hp.create("Document to be modified", "test", "Modify me, baby")
+    create_doc = Document.new create_response
+    id = create_doc.root.elements["id"].text
+    if create_doc.root.elements["saved"].text = "true"
+      assert_nothing_raised do
+        response = @hp.update(id)
+        assert_nil(response, "Update should return nil when no params are supplied.")
+
+        response = @hp.update(id, :title => "Modified the title")
+        doc = Document.new response
+        assert_equal("true", doc.root.text, "Document wasn't updated.")
+        doc = Document.new @hp.get(id)
+        assert_equal("Modified the title", doc.root.elements["title"].text, "Title is wrong.")
+        
+        response = @hp.update(id, :source => "Modified, darlin'")
+        doc = Document.new response
+        assert_equal("true", doc.root.text, "Document wasn't updated.")
+        doc = Document.new @hp.get(id)
+        assert_equal("Modified, darlin'", doc.root.elements["source"].text, "Source is wrong.")
+
+        response = @hp.update(id, :tags => "test stuff")
+        doc = Document.new response
+        assert_equal("true", doc.root.text, "Document wasn't updated.")
+        doc = Document.new @hp.get(id)
+        tags = Array.new
+        XPath.match(doc, "//tags/tag/name/child::text()").each do |tag|
+          tags.push tag.to_s
+        end
+        assert_equal(["test", "stuff"], tags, "Tags are wrong.")
+      end
+      @hp.destroy(id)
+    end
+  end
 end
