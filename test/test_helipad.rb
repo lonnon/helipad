@@ -19,7 +19,8 @@ class TestHelipad < Test::Unit::TestCase
   
   def test_create
     assert_nothing_raised do
-      response = @hp.create("New document", "test", "Just a test document")
+      response = @hp.create(:title => "New document", :tags => "test",
+                            :source => "Just a test document")
       doc = Document.new response
       created = doc.root.elements["saved"].text
       assert_equal("true", created, "Document not created.")
@@ -28,7 +29,8 @@ class TestHelipad < Test::Unit::TestCase
   end
   
   def test_destroy
-    create_response = @hp.create("Document for deletion", "test", "Should be deleted by test case")
+    create_response = @hp.create(:title => "Document for deletion", :tags => "test",
+                                 :source => "Should be deleted by test case")
     create_doc = Document.new create_response
     id = create_doc.root.elements["id"].text
     assert_nothing_raised do
@@ -57,7 +59,8 @@ class TestHelipad < Test::Unit::TestCase
   end
 
   def test_update
-    create_response = @hp.create("Document to be modified", "test", "Modify me, baby")
+    create_response = @hp.create(:title => "Document to be modified", :tags => "test",
+                                 :source => "Modify me, baby")
     create_doc = Document.new create_response
     id = create_doc.root.elements["id"].text
     if create_doc.root.elements["saved"].text = "true"
