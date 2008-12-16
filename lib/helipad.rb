@@ -1,5 +1,6 @@
 require 'net/http'
 require 'uri'
+require 'rexml/document'
 
 class Helipad
   def initialize(email, password)
@@ -30,7 +31,7 @@ class Helipad
   </document>
 </request>'
 END_OF_CREATE_REQUEST
-    send_request(url, request) if title or tags or source
+    response = Response.new(send_request(url, request)) if title or tags or source
   end
   
   def destroy(id)
@@ -68,7 +69,36 @@ END_OF_CREATE_REQUEST
   </document>
 </request>
 END_OF_UPDATE_REQUEST
-    send_request(url, request) if title or tags or source
+    response = Response.new(send_request(url, request)) if title or tags or source
+  end
+  
+  class Document
+    def initialize(params = nil)
+      if params
+        @id = params[:id]
+        @title = params[:title]
+        @tags = params[:tags].split unless params[:tags].nil?
+        @source = params[:source]
+        @raw_response = params[:raw_response]
+      end
+    end
+  end
+
+  class Response
+    def initialize(raw_response)
+      doc = REXML::Document.new raw_response
+      REXML::XPath.match(doc, "response/*").each do |tag|
+        Response.create_attribute tag.name, tag.text
+      end
+    end
+    
+    private
+    
+    def self.create_attribute(name, value)
+      return unless name
+      code = "def #{name}; @#{name}; end\n"
+      class_eval code
+    end
   end
   
 private
