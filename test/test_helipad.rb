@@ -11,20 +11,12 @@ class TestHelipad < Test::Unit::TestCase
     @hp = Helipad.new(@email, @password)
   end
   
-  def test_authenticate
-    assert_nothing_raised do
-      @hp.authenticate
-    end
-  end
-  
   def test_create
     assert_nothing_raised do
       response = @hp.create(:title => "New document", :tags => "test",
                             :source => "Just a test document")
-      doc = Document.new response
-      created = doc.root.elements["saved"].text
-      assert_equal("true", created, "Document not created.")
-      @hp.destroy(doc.root.elements["id"].text) if created = "true"
+      assert_equal(true, response.doc_saved?, "Document not created")
+      @hp.destroy(doc.root.elements["id"].text) if response.doc_saved?
     end
   end
   
@@ -50,6 +42,12 @@ class TestHelipad < Test::Unit::TestCase
     assert_equal("test", doc.root.elements["source"].text, "Source is wrong.")
     assert_equal("test", doc.root.elements["tags/tag/name"].text, "Tags are wrong.")
     assert_equal(1, XPath.match(doc, "//tag").size, "Wrong number of tags.")
+  end
+  
+  def test_get_all
+    assert_nothing_raised do
+      @hp.get_all
+    end
   end
   
   def test_get_html

@@ -8,12 +8,6 @@ class Helipad
     @password = password
   end
   
-  def authenticate
-    url = URI.parse("http://pad.helicoid.net/")
-    request = "<request>#{authentication_block}</request>"
-    send_request(url, request)
-  end
-
   def create(params = nil)
     url = URI.parse("http://pad.helicoid.net/document/create")
     if params
@@ -31,13 +25,13 @@ class Helipad
   </document>
 </request>'
 END_OF_CREATE_REQUEST
-    response = Response.new(send_request(url, request)) if title or tags or source
+    Response.new(send_request(url, request)) if title or tags or source
   end
   
   def destroy(id)
     url = URI.parse("http://pad.helicoid.net/document/#{id}/destroy")
     request = "<request>#{authentication_block}</request>"
-    send_request(url, request)
+    Response.new(send_request(url, request))
   end
   
   def get(id)
@@ -46,6 +40,12 @@ END_OF_CREATE_REQUEST
     send_request(url, request)
   end
   
+  def get_all
+    url = URI.parse("http://pad.helicoid.net/")
+    request = "<request>#{authentication_block}</request>"
+    send_request(url, request)
+  end
+
   def get_html(id)
     url = URI.parse("http://pad.helicoid.net/document/#{id}/format/html")
     request = "<request>#{authentication_block}</request>"
@@ -69,7 +69,7 @@ END_OF_CREATE_REQUEST
   </document>
 </request>
 END_OF_UPDATE_REQUEST
-    response = Response.new(send_request(url, request)) if title or tags or source
+    Response.new(send_request(url, request)) if title or tags or source
   end
   
   class Document
@@ -87,17 +87,37 @@ END_OF_UPDATE_REQUEST
   class Response
     def initialize(raw_response)
       doc = REXML::Document.new raw_response
-      REXML::XPath.match(doc, "response/*").each do |tag|
-        Response.create_attribute tag.name, tag.text
+      REXML::XPath.match(doc, "//*").each do |tag|
+        suffix = ""
+        case tag.name
+        when "saved"
+          name = "saved"
+          suffix = "?"
+          value = tag.text == "true" ? true : false
+        when "deleted"
+          name = "deleted"
+          suffix = "?"
+          value = tag.text == "true" ? true : false
+        when "id"
+          name = "id"
+          value = Integer(tag.text)
+        else
+          name = tag.name
+          value = tag.text
+        end
+        self.instance_eval %{
+          def self.doc_#{name}#{suffix}
+            @doc_#{name}
+          end
+          @doc_#{name} = value
+        }, __FILE__, __LINE__ unless tag.name == "response"
       end
-    end
-    
-    private
-    
-    def self.create_attribute(name, value)
-      return unless name
-      code = "def #{name}; @#{name}; end\n"
-      class_eval code
+      self.instance_eval %{
+        def self.raw_response
+          @raw_response
+        end
+        @raw_response = %{#{raw_response}}
+      }, __FILE__, __LINE__
     end
   end
   
