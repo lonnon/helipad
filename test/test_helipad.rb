@@ -15,21 +15,17 @@ class TestHelipad < Test::Unit::TestCase
     assert_nothing_raised do
       response = @hp.create(:title => "New document", :tags => "test",
                             :source => "Just a test document")
-      assert_equal(true, response.doc_saved?, "Document not created")
-      @hp.destroy(doc.root.elements["id"].text) if response.doc_saved?
+      assert_equal(true, response.doc_saved?, "Document not created.")
+      @hp.destroy(response.doc_id) if response.doc_saved?
     end
   end
   
   def test_destroy
     create_response = @hp.create(:title => "Document for deletion", :tags => "test",
                                  :source => "Should be deleted by test case")
-    create_doc = Document.new create_response
-    id = create_doc.root.elements["id"].text
     assert_nothing_raised do
-      response = @hp.destroy(id)
-      doc = Document.new response
-      deleted = doc.root.text
-      assert_equal("true", deleted, "Document not deleted.")
+      response = @hp.destroy(create_response.doc_id)
+      assert_equal(true, response.doc_deleted?, "Document not deleted.")
     end
   end
 
@@ -59,29 +55,24 @@ class TestHelipad < Test::Unit::TestCase
   def test_update
     create_response = @hp.create(:title => "Document to be modified", :tags => "test",
                                  :source => "Modify me, baby")
-    create_doc = Document.new create_response
-    id = create_doc.root.elements["id"].text
-    if create_doc.root.elements["saved"].text = "true"
+    if create_response.doc_saved?
       assert_nothing_raised do
-        response = @hp.update(id)
+        response = @hp.update(create_response.doc_id)
         assert_nil(response, "Update should return nil when no params are supplied.")
 
-        response = @hp.update(id, :title => "Modified the title")
-        doc = Document.new response
-        assert_equal("true", doc.root.text, "Document wasn't updated.")
-        doc = Document.new @hp.get(id)
+        response = @hp.update(create_response.doc_id, :title => "Modified the title")
+        assert_equal(true, response.doc_saved?, "Document wasn't updated.")
+        doc = Document.new @hp.get(create_response.doc_id)
         assert_equal("Modified the title", doc.root.elements["title"].text, "Title is wrong.")
         
-        response = @hp.update(id, :source => "Modified, darlin'")
-        doc = Document.new response
-        assert_equal("true", doc.root.text, "Document wasn't updated.")
-        doc = Document.new @hp.get(id)
+        response = @hp.update(create_response.doc_id, :source => "Modified, darlin'")
+        assert_equal(true, response.doc_saved?, "Document wasn't updated.")
+        doc = Document.new @hp.get(create_response.doc_id)
         assert_equal("Modified, darlin'", doc.root.elements["source"].text, "Source is wrong.")
 
-        response = @hp.update(id, :tags => "test stuff")
-        doc = Document.new response
-        assert_equal("true", doc.root.text, "Document wasn't updated.")
-        doc = Document.new @hp.get(id)
+        response = @hp.update(create_response.doc_id, :tags => "test stuff")
+        assert_equal(true, response.doc_saved?, "Document wasn't updated.")
+        doc = Document.new @hp.get(create_response.doc_id)
         tags = Array.new
         XPath.match(doc, "//tags/tag/name/child::text()").each do |tag|
           tags.push tag.to_s
