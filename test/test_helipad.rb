@@ -1,7 +1,6 @@
 $:.unshift File.join(File.dirname(__FILE__), "..", "lib")
 require 'helipad'
 require 'test/unit'
-require 'rexml/document'
 
 class TestHelipad < Test::Unit::TestCase
   def setup
