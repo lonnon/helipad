@@ -8,7 +8,7 @@ class TestHelipad < Test::Unit::TestCase
   def setup
     @email = "lonnon.foster@gmail.com"
     @password = "TimP4H"
-    @hp = Helipad.new(@email, @password)
+    @hp = Helipad.new(:email => @email, :password => @password)
   end
   
   def test_create

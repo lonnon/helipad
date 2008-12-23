@@ -1,11 +1,14 @@
 require 'net/http'
 require 'uri'
 require 'rexml/document'
+require 'date'
 
 class Helipad
-  def initialize(email, password)
-    @email = email
-    @password = password
+  def initialize(params = nil)
+    @email = params[:email]
+    @password = params[:password]
+    raise(ArgumentError, "Email address not specified", caller) if @email.nil?
+    raise(ArgumentError, "Password not specified", caller) if @password.nil?
   end
   
   def create(params = nil)
@@ -37,7 +40,7 @@ END_OF_CREATE_REQUEST
   def get(id)
     url = URI.parse("http://pad.helicoid.net/document/#{id}/get")
     request = "<request>#{authentication_block}</request>"
-    send_request(url, request)
+    Document.new(send_request(url, request))
   end
   
   def get_all
@@ -49,7 +52,8 @@ END_OF_CREATE_REQUEST
   def get_html(id)
     url = URI.parse("http://pad.helicoid.net/document/#{id}/format/html")
     request = "<request>#{authentication_block}</request>"
-    send_request(url, request)
+    doc = REXML::Document.new(send_request(url, request))
+    REXML::XPath.match(doc, "html/child::text()").join.strip
   end
   
   def update(id, params = nil)
@@ -73,14 +77,64 @@ END_OF_UPDATE_REQUEST
   end
   
   class Document
-    def initialize(params = nil)
-      if params
-        @id = params[:id]
-        @title = params[:title]
-        @tags = params[:tags].split unless params[:tags].nil?
-        @source = params[:source]
-        @raw_response = params[:raw_response]
+    def initialize(raw_response)
+      doc = REXML::Document.new raw_response
+      REXML::XPath.match(doc, "document/*").each do |tag|
+        suffix = ""
+        case tag.name
+        when "approved"
+          name = "approved"
+          suffix = "?"
+          value = tag.text == "true" ? true : false
+        when "created-on"
+          name = "created_on"
+          value = DateTime.parse tag.text
+        when "dangerous"
+          name = "dangerous"
+          suffix = "?"
+          value = tag.text == "true" ? true : false
+        when "share"
+          name = "share"
+          if tag.attributes["nil"] == "true"
+            value = nil
+          else
+            value = tag.text
+          end
+        when "source"
+          name = "source"
+          value = tag.text
+        when "title"
+          name = "title"
+          value = tag.text
+        when "updated-on"
+          name = "updated_on"
+          value = DateTime.parse tag.text
+        when "id"
+          name = "id"
+          value = Integer(tag.text)
+        when "tags"
+          name = "tags"
+          value = Array.new
+          REXML::XPath.match(tag, "tag/name/child::text()").each do |this_tag|
+            value.push this_tag.to_s
+          end
+        else
+          name = tag.name
+          value = tag.text
+        end
+        self.instance_eval %{
+          def self.doc_#{name}#{suffix}
+            @doc_#{name}
+          end
+          @doc_#{name} = value
+        }, __FILE__, __LINE__
       end
+      self.instance_eval %{
+        def self.raw_response
+          @raw_response
+        end
+        @raw_response = %{#{raw_response}}
+      }, __FILE__, __LINE__
     end
   end
 
