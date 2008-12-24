@@ -1,3 +1,14 @@
+# Ruby interface to the excellent Helipad[http://pad.helicoid.net/home.html] online note pad.
+# 
+# Author: Lonnon Foster <lonnon.foster@gmail.com>
+# 
+# Copyright (c) 2008 Lonnon Foster. All rights reserved.
+# 
+# = Overview
+# 
+# foo
+
+
 require 'net/http'
 require 'uri'
 require 'rexml/document'
