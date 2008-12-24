@@ -46,7 +46,12 @@ END_OF_CREATE_REQUEST
   def get_all
     url = URI.parse("http://pad.helicoid.net/")
     request = "<request>#{authentication_block}</request>"
-    send_request(url, request)
+    response = REXML::Document.new(send_request(url, request))
+    documents = Array.new
+    REXML::XPath.match(response, "//document").each do |doc|
+      documents.push Document.new(doc)
+    end
+    documents
   end
 
   def get_html(id)
@@ -77,8 +82,12 @@ END_OF_UPDATE_REQUEST
   end
   
   class Document
-    def initialize(raw_response)
-      doc = REXML::Document.new raw_response
+    def initialize(source)
+      if source.kind_of? REXML::Element
+        doc = REXML::Document.new(source.to_s)
+      else
+        doc = REXML::Document.new(source)
+      end
       REXML::XPath.match(doc, "document/*").each do |tag|
         suffix = ""
         case tag.name
@@ -133,7 +142,7 @@ END_OF_UPDATE_REQUEST
         def self.raw_response
           @raw_response
         end
-        @raw_response = %{#{raw_response}}
+        @raw_response = %{#{source}}
       }, __FILE__, __LINE__
     end
   end
