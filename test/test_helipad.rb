@@ -40,9 +40,13 @@ class TestHelipad < Test::Unit::TestCase
   end
   
   def test_get_all
+    documents = nil
     assert_nothing_raised do
-      @hp.get_all
+      documents = @hp.get_all
     end
+    assert_equal("test", documents[0].doc_title, "First document title is wrong.")
+    assert_equal("test", documents[0].doc_source, "First document source is wrong.")
+    assert_equal(["test"], documents[0].doc_tags, "First document tags are wrong.")
   end
   
   def test_get_html
