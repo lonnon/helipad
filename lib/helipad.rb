@@ -83,6 +83,17 @@ END_OF_CREATE_REQUEST
     documents
   end
   
+  def search(term)
+    url = URI.parse("http://pad.helicoid.net/document/search")
+    request = "<request>#{authentication_block}<search>#{term}</search></request>"
+    response = REXML::Document.new(send_request(url, request))
+    documents = Array.new
+    REXML::XPath.match(response, "//document").each do |doc|
+      documents.push Document.new(doc)
+    end
+    documents.size > 0 ? documents : nil
+  end
+  
   def update(id, params = nil)
     url = URI.parse("http://pad.helicoid.net/document/#{id}/update")
     if params

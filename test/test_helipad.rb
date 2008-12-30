@@ -67,6 +67,17 @@ class TestHelipad < Test::Unit::TestCase
     assert_equal("test", documents[0].doc_title, "First document title is wrong.")
   end
   
+  def test_search
+    documents = nil
+    assert_nothing_raised do
+      documents = @hp.search("test")
+    end
+    assert_equal("test", documents[0].doc_title, "First document title is wrong.")
+    
+    documents = @hp.search("32908p9832tn9p85h92gng825g82ngp88p9834p98v348anvs8")
+    assert_nil(documents, "Bogus string should not be found.")
+  end
+  
   def test_update
     create_response = @hp.create(:title => "Document to be modified", :tags => "test",
                                  :source => "Modify me, baby")
