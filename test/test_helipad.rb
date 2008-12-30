@@ -59,6 +59,14 @@ class TestHelipad < Test::Unit::TestCase
     assert_equal(exemplar, html, "HTML contents are wrong.")
   end
 
+  def test_get_titles
+    documents = nil
+    assert_nothing_raised do
+      documents = @hp.get_titles
+    end
+    assert_equal("test", documents[0].doc_title, "First document title is wrong.")
+  end
+  
   def test_update
     create_response = @hp.create(:title => "Document to be modified", :tags => "test",
                                  :source => "Modify me, baby")

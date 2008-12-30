@@ -72,6 +72,17 @@ END_OF_CREATE_REQUEST
     REXML::XPath.match(doc, "html/child::text()").join.strip
   end
   
+  def get_titles
+    url = URI.parse("http://pad.helicoid.net/documents/titles")
+    request = "<request>#{authentication_block}</request>"
+    response = REXML::Document.new(send_request(url, request))
+    documents = Array.new
+    REXML::XPath.match(response, "//document").each do |doc|
+      documents.push Document.new(doc)
+    end
+    documents
+  end
+  
   def update(id, params = nil)
     url = URI.parse("http://pad.helicoid.net/document/#{id}/update")
     if params
