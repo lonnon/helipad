@@ -15,9 +15,9 @@ require 'rexml/document'
 require 'date'
 
 class Helipad
-  def initialize(params = nil)
-    @email = params[:email]
-    @password = params[:password]
+  def initialize(email, password)
+    @email = email
+    @password = password
     raise(ArgumentError, "Email address not specified", caller) if @email.nil?
     raise(ArgumentError, "Password not specified", caller) if @password.nil?
   end
