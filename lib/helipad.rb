@@ -22,14 +22,16 @@ class Helipad
     raise(ArgumentError, "Password not specified", caller) if @password.nil?
   end
   
-  def create(params = nil)
+  def create(*args)
+    options = args.extract_options!
+    validate_options(options, :create)
+    raise(ArgumentError, "No document options specified", caller) if options.empty?
+    raise(ArgumentError, "Document must have a title", caller) if options[:title].nil?
+    title = "<title>#{options[:title]}</title>"
+    tags = "<tags>#{options[:tags]}</tags>" unless options[:tags].nil?
+    source = "<source>#{options[:source]}</source>" unless options[:source].nil?
     url = URI.parse("http://pad.helicoid.net/document/create")
-    if params
-      title = "<title>#{params[:title]}</title>" unless params[:title].nil?
-      tags = "<tags>#{params[:tags]}</tags>" unless params[:tags].nil?
-      source = "<source>#{params[:source]}</source>" unless params[:source].nil?
-    end
-    request = <<END_OF_CREATE_REQUEST
+    request = %{
 <request>
   #{authentication_block}
   <document>
@@ -37,11 +39,11 @@ class Helipad
     #{source}
     #{tags}
   </document>
-</request>'
-END_OF_CREATE_REQUEST
+</request>
+    }
     Response.new(send_request(url, request)) if title or tags or source
   end
-  
+
   def destroy(id)
     url = URI.parse("http://pad.helicoid.net/document/#{id}/destroy")
     request = "<request>#{authentication_block}</request>"
@@ -49,12 +51,12 @@ END_OF_CREATE_REQUEST
   end
   
   def find(*args)
-    raise(ArgumentError, "No arguments supplied", caller) if args.size == 0
+    raise(ArgumentError, "No find arguments supplied", caller) if args.size == 0
     term = args.extract_search_term!
     case args.first
       when :tag then find_by_tag(term)
       when nil  then search(term)
-      else           raise(ArgumentError, "Unknown option '#{args.first}' supplied", caller)
+      else           raise(ArgumentError, "Unknown find option '#{args.first}' supplied", caller)
     end
   end
   
@@ -218,11 +220,6 @@ END_OF_UPDATE_REQUEST
   
 private
   
-  def assert_valid_keys(*valid_keys)
-    unknown_keys = keys - [valid_keys].flatten
-    raise(ArgumentError, "Unknown key(s): #{unknown_keys.join(", ")}") unless unknown_keys.empty?
-  end
-  
   def authentication_block
     block = <<END_OF_AUTHENTICATION
 <authentication>
@@ -268,12 +265,17 @@ END_OF_AUTHENTICATION
     end
   end
   
-  VALID_FIND_OPTIONS = [:tag]
+  VALID_CREATE_OPTIONS = [:title, :source, :tags]
+  VALID_UPDATE_OPTIONS = [:title, :source, :tags]
   
-  def validate_find_options(options)
-    options.assert_valid_keys(VALID_FIND_OPTIONS)
+  def validate_options(options, action)
+    case action
+      when :create then constant = VALID_CREATE_OPTIONS
+      when :find   then constant = VALID_FIND_OPTIONS
+      when :update then constant = VALID_UPDATE_OPTIONS
+    end
+    options.assert_valid_keys(constant)
   end
-
 end
 
 
@@ -284,5 +286,13 @@ class Array
 
   def extract_search_term!
     last.is_a?(::String) ? pop : nil
+  end
+end
+
+
+class Hash
+  def assert_valid_keys(*valid_keys)
+    unknown_keys = keys - [valid_keys].flatten
+    raise(ArgumentError, "Unknown key(s): #{unknown_keys.join(", ")}") unless unknown_keys.empty?
   end
 end
