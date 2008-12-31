@@ -29,6 +29,29 @@ class TestHelipad < Test::Unit::TestCase
     assert_equal(true, response.doc_deleted?, "Document not deleted.")
   end
 
+  def test_find
+    documents = nil
+    assert_nothing_raised do
+      documents = @hp.find("test")
+    end
+    assert_equal("test", documents[0].doc_title, "By search term: First document title is wrong.")
+    
+    documents = @hp.find("32908p9832tn9p85h92gng825g82ngp88p9834p98v348anvs8")
+    assert_nil(documents, "Bogus string should not be found.")
+    
+    assert_nothing_raised do
+      documents = @hp.find(:tag, "test")
+    end
+    assert_equal("test", documents[0].doc_title, "By tag: First document title is wrong.")
+    
+    documents = @hp.find(:tag, "02vhn45g70h4cgh0872h54gmv072hm45g70hmv0hmv2g20457gh")
+    assert_nil(documents, "Bogus tag should not be found.")
+    
+    assert_raise(ArgumentError) {@hp.find}
+    assert_raise(ArgumentError) {@hp.find(:wibble)}
+    assert_raise(ArgumentError) {@hp.find(:tag)}
+  end
+  
   def test_get
     doc = nil
     assert_nothing_raised do
@@ -65,17 +88,6 @@ class TestHelipad < Test::Unit::TestCase
       documents = @hp.get_titles
     end
     assert_equal("test", documents[0].doc_title, "First document title is wrong.")
-  end
-  
-  def test_search
-    documents = nil
-    assert_nothing_raised do
-      documents = @hp.search("test")
-    end
-    assert_equal("test", documents[0].doc_title, "First document title is wrong.")
-    
-    documents = @hp.search("32908p9832tn9p85h92gng825g82ngp88p9834p98v348anvs8")
-    assert_nil(documents, "Bogus string should not be found.")
   end
   
   def test_update

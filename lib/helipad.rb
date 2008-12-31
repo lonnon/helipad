@@ -48,6 +48,16 @@ END_OF_CREATE_REQUEST
     Response.new(send_request(url, request))
   end
   
+  def find(*args)
+    raise(ArgumentError, "No arguments supplied", caller) if args.size == 0
+    term = args.extract_search_term!
+    case args.first
+      when :tag then find_by_tag(term)
+      when nil  then search(term)
+      else           raise(ArgumentError, "Unknown option '#{args.first}' supplied", caller)
+    end
+  end
+  
   def get(id)
     url = URI.parse("http://pad.helicoid.net/document/#{id}/get")
     request = "<request>#{authentication_block}</request>"
@@ -81,17 +91,6 @@ END_OF_CREATE_REQUEST
       documents.push Document.new(doc)
     end
     documents
-  end
-  
-  def search(term)
-    url = URI.parse("http://pad.helicoid.net/document/search")
-    request = "<request>#{authentication_block}<search>#{term}</search></request>"
-    response = REXML::Document.new(send_request(url, request))
-    documents = Array.new
-    REXML::XPath.match(response, "//document").each do |doc|
-      documents.push Document.new(doc)
-    end
-    documents.size > 0 ? documents : nil
   end
   
   def update(id, params = nil)
@@ -219,6 +218,11 @@ END_OF_UPDATE_REQUEST
   
 private
   
+  def assert_valid_keys(*valid_keys)
+    unknown_keys = keys - [valid_keys].flatten
+    raise(ArgumentError, "Unknown key(s): #{unknown_keys.join(", ")}") unless unknown_keys.empty?
+  end
+  
   def authentication_block
     block = <<END_OF_AUTHENTICATION
 <authentication>
@@ -226,6 +230,29 @@ private
     <password>#{@password}</password>
   </authentication>
 END_OF_AUTHENTICATION
+  end
+  
+  def find_by_tag(tag)
+    raise(ArgumentError, "No tag supplied", caller) if tag.nil?
+    url = URI.parse("http://pad.helicoid.net/document/tag/#{URI.escape(tag)}")
+    request = "<request>#{authentication_block}</request>"
+    response = REXML::Document.new(send_request(url, request))
+    documents = Array.new
+    REXML::XPath.match(response, "//document").each do |doc|
+      documents.push Document.new(doc)
+    end
+    documents.size > 0 ? documents : nil
+  end
+
+  def search(term)
+    url = URI.parse("http://pad.helicoid.net/document/search")
+    request = "<request>#{authentication_block}<search>#{term}</search></request>"
+    response = REXML::Document.new(send_request(url, request))
+    documents = Array.new
+    REXML::XPath.match(response, "//document").each do |doc|
+      documents.push Document.new(doc)
+    end
+    documents.size > 0 ? documents : nil
   end
   
   def send_request(url, request)
@@ -240,5 +267,22 @@ END_OF_AUTHENTICATION
       response.error!
     end
   end
+  
+  VALID_FIND_OPTIONS = [:tag]
+  
+  def validate_find_options(options)
+    options.assert_valid_keys(VALID_FIND_OPTIONS)
+  end
 
+end
+
+
+class Array
+  def extract_options!
+    last.is_a?(::Hash) ? pop : {}
+  end
+
+  def extract_search_term!
+    last.is_a?(::String) ? pop : nil
+  end
 end
