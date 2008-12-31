@@ -95,11 +95,9 @@ class TestHelipad < Test::Unit::TestCase
                                  :source => "Modify me, baby")
     if create_response.doc_saved?
       response = nil
-      assert_nothing_raised do
-        response = @hp.update(create_response.doc_id)
-      end
-      assert_nil(response, "Update should return nil when no params are supplied.")
-
+      assert_raise(ArgumentError) {@hp.update(create_response.doc_id)}
+      assert_raise(ArgumentError) {@hp.update(create_response.doc_id, :wibble => "freem")}
+      
       response = @hp.update(create_response.doc_id, :title => "Modified the title")
       assert_equal(true, response.doc_saved?, "Document title wasn't updated.")
       doc = @hp.get(create_response.doc_id)

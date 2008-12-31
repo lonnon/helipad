@@ -95,7 +95,29 @@ class Helipad
     documents
   end
   
-  def update(id, params = nil)
+  def update(id, *args)
+    url = URI.parse("http://pad.helicoid.net/document/#{id}/update")
+    options = args.extract_options!
+    validate_options(options, :update)
+    title = "<title>#{options[:title]}</title>" unless options[:title].nil?
+    tags = "<tags>#{options[:tags]}</tags>" unless options[:tags].nil?
+    source = "<source>#{options[:source]}</source>" unless options[:source].nil?
+    raise(ArgumentError, "No options specified", caller) if (title.nil? and tags.nil? and source.nil?)
+    request = %{
+<request>
+  #{authentication_block}
+  <document>
+    #{title}
+    #{source}
+    #{tags}
+  </document>
+</request>
+    }
+    Response.new(send_request(url, request))
+  end
+  
+  
+  def old_update(id, params = nil)
     url = URI.parse("http://pad.helicoid.net/document/#{id}/update")
     if params
       title = "<title>#{params[:title]}</title>" unless params[:title].nil?
