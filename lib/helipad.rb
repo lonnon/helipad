@@ -6,7 +6,7 @@
 # 
 # == Overview
 # 
-# This file provides three classes for working with \Helipad.
+# This file provides three classes for working with Helipad[http://pad.helicoid.net/home.html].
 # 
 # == Examples of Use
 #
@@ -17,7 +17,7 @@
 # === Getting an Existing Document
 #
 #     document = hp.get(3)
-#     puts document.doc_source
+#     puts document.source
 #
 # === Get a Document Formatted as HTML
 #
@@ -36,7 +36,7 @@
 # === Finding Documents by Tags
 #
 #     documents = hp.find(:tag, "work")
-#     titles = documents.collect { |doc| doc.doc_title }
+#     titles = documents.collect { |doc| doc.title }
 #     puts "Documents tagged with 'work':\n  #{titles.join("\n  ")}"
 #
 # === Creating a Document
@@ -45,7 +45,7 @@
 #     response = hp.create(:title  => "Delicious Chocolate Cake",
 #                          :tags   => "recipe dessert",
 #                          :source => source)
-#     puts "Recipe saved" if response.doc_saved?
+#     puts "Recipe saved" if response.saved?
 #
 # === Delete Documents
 #
@@ -207,7 +207,7 @@ class Helipad
           name = "updated_on"
           value = DateTime.parse tag.text
         when "id"
-          name = "id"
+          name = "doc_id"
           value = Integer(tag.text)
         when "tags"
           name = "tags"
@@ -220,10 +220,10 @@ class Helipad
           value = tag.text
         end
         self.instance_eval %{
-          def self.doc_#{name}#{suffix}
-            @doc_#{name}
+          def self.#{name}#{suffix}
+            @#{name}
           end
-          @doc_#{name} = value
+          @#{name} = value
         }, __FILE__, __LINE__
       end
       self.instance_eval %{
@@ -250,17 +250,17 @@ class Helipad
           suffix = "?"
           value = tag.text == "true" ? true : false
         when "id"
-          name = "id"
+          name = "doc_id"
           value = Integer(tag.text)
         else
           name = tag.name
           value = tag.text
         end
         self.instance_eval %{
-          def self.doc_#{name}#{suffix}
-            @doc_#{name}
+          def self.#{name}#{suffix}
+            @#{name}
           end
-          @doc_#{name} = value
+          @#{name} = value
         }, __FILE__, __LINE__ unless tag.name == "response"
       end
       self.instance_eval %{
