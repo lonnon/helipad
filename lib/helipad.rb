@@ -4,17 +4,69 @@
 # 
 # Copyright (c) 2008 Lonnon Foster. All rights reserved.
 # 
-# = Overview
+# == Overview
 # 
-# foo
-
+# This file provides three classes for working with \Helipad.
+# 
+# == Examples of Use
+#
+# All of these examples assume that a Helipad object called +hp+ exists.
+#
+#     hp = Helipad.new("lonnon@example.com", "password")
+#     
+# === Getting an Existing Document
+#
+#     document = hp.get(3)
+#     puts document.doc_source
+#
+# === Get a Document Formatted as HTML
+#
+#     puts hp.get_html(3)
+#
+# === Finding Documents
+#
+#     def how_many(search_term)
+#       documents = hp.find(search_term)
+#       documents.size
+#     end
+#
+#     find_this = "wombats"
+#     puts "#{how_many(find_this)} document(s) were found containing '#{find_this}'."
+#
+# === Finding Documents by Tags
+#
+#     documents = hp.find(:tag, "work")
+#     titles = documents.collect { |doc| doc.doc_title }
+#     puts "Documents tagged with 'work':\n  #{titles.join("\n  ")}"
+#
+# === Creating a Document
+#
+#     source = File.read("cake_recipe.txt")
+#     response = hp.create(:title  => "Delicious Chocolate Cake",
+#                          :tags   => "recipe dessert",
+#                          :source => source)
+#     puts "Recipe saved" if response.doc_saved?
+#
+# === Delete Documents
+#
+#     doc_ids = hp.find(:tag, "incriminating").collect { |doc| doc.doc_id }
+#     doc_ids.each do |id|
+#       hp.destroy(id)
+#     end
 
 require 'net/http'
 require 'uri'
 require 'rexml/document'
 require 'date'
 
+# Class +Helipad+ provides a wrapper for the {Helipad XML
+# API}[http://pad.helicoid.net/document/public/6313d317].
+#
+# See the documentation for the file helipad.rb for an overview.
 class Helipad
+  # Create a new Helipad object.
+  #
+  # +email+ and +password+ are the same credentials you use to log on to your Helipad account.
   def initialize(email, password)
     @email = email
     @password = password
@@ -116,26 +168,6 @@ class Helipad
     Response.new(send_request(url, request))
   end
   
-  
-  def old_update(id, params = nil)
-    url = URI.parse("http://pad.helicoid.net/document/#{id}/update")
-    if params
-      title = "<title>#{params[:title]}</title>" unless params[:title].nil?
-      tags = "<tags>#{params[:tags]}</tags>" unless params[:tags].nil?
-      source = "<source>#{params[:source]}</source>" unless params[:source].nil?
-    end
-    request = <<END_OF_UPDATE_REQUEST
-<request>
-  #{authentication_block}
-  <document>
-    #{title}
-    #{source}
-    #{tags}
-  </document>
-</request>
-END_OF_UPDATE_REQUEST
-    Response.new(send_request(url, request)) if title or tags or source
-  end
   
   class Document
     def initialize(source)
@@ -243,12 +275,12 @@ END_OF_UPDATE_REQUEST
 private
   
   def authentication_block
-    block = <<END_OF_AUTHENTICATION
+    block = %{
 <authentication>
-    <email>#{@email}</email>
-    <password>#{@password}</password>
-  </authentication>
-END_OF_AUTHENTICATION
+  <email>#{@email}</email>
+  <password>#{@password}</password>
+</authentication>
+    }
   end
   
   def find_by_tag(tag)
@@ -293,7 +325,6 @@ END_OF_AUTHENTICATION
   def validate_options(options, action)
     case action
       when :create then constant = VALID_CREATE_OPTIONS
-      when :find   then constant = VALID_FIND_OPTIONS
       when :update then constant = VALID_UPDATE_OPTIONS
     end
     options.assert_valid_keys(constant)
