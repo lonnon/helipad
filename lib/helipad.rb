@@ -100,13 +100,23 @@ class Helipad
   # +args+ is a hash containing options for the created document.
   #
   # ==== Parameters
-  # * <tt>:title</tt> - Title for the new document. This parameter is required.
+  # * <tt>:title</tt> - Title for the new document. This parameter is
+  #   required.
   # * <tt>:tags</tt> - Space-separated list of tags for the new document.
   # * <tt>:source</tt> - Body of the new document.
+  #   Helipad[http://pad.helicoid.net/home.html] understands {Textile markup}[http://pad.helicoid.net/formatting],
+  #   which you can use to format the document's text.
   #
   # ==== Returns
   # This method returns a <tt>Helipad::Response</tt> object. The response's
-  # <tt>saved?</tt> method returns +true+ if the document was created successfully.
+  # <tt>saved?</tt> method returns +true+ if the document was created
+  # successfully.
+  #
+  # ==== Example
+  #     hp = Helipad.new("lonnon.example.com", "password")
+  #     response = hp.create(:title => "Marsupial Inventory",
+  #                          :tags  => "marsupial australia animals",
+  #                          :source => "|koala|2|\n|kangaroo|8|\n|platypus|1|")
   def create(*args)
     options = args.extract_options!
     validate_options(options, :create)
