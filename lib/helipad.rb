@@ -112,27 +112,13 @@ class Helipad
     validate_options(options, :create)
     raise(ArgumentError, "No document options specified", caller) if options.empty?
     raise(ArgumentError, "Document must have a title", caller) if options[:title].nil?
-    title = "<title>#{options[:title]}</title>"
-    tags = "<tags>#{options[:tags]}</tags>" unless options[:tags].nil?
-    source = "<source>#{options[:source]}</source>" unless options[:source].nil?
     url = URI.parse("http://pad.helicoid.net/document/create")
-    request = %{
-<request>
-  #{authentication_block}
-  <document>
-    #{title}
-    #{source}
-    #{tags}
-  </document>
-</request>
-    }
-    Response.new(send_request(url, request))
+    Response.new(send_request(url, build_request(options)))
   end
 
   def destroy(id)
     url = URI.parse("http://pad.helicoid.net/document/#{id}/destroy")
-    request = "<request>#{authentication_block}</request>"
-    Response.new(send_request(url, request))
+    Response.new(send_request(url, build_request))
   end
   
   def find(*args)
@@ -147,14 +133,12 @@ class Helipad
   
   def get(id)
     url = URI.parse("http://pad.helicoid.net/document/#{id}/get")
-    request = "<request>#{authentication_block}</request>"
-    Document.new(send_request(url, request))
+    Document.new(send_request(url, build_request))
   end
   
   def get_all
     url = URI.parse("http://pad.helicoid.net/")
-    request = "<request>#{authentication_block}</request>"
-    response = REXML::Document.new(send_request(url, request))
+    response = REXML::Document.new(send_request(url, build_request))
     documents = Array.new
     REXML::XPath.match(response, "//document").each do |doc|
       documents.push Document.new(doc)
@@ -164,15 +148,13 @@ class Helipad
 
   def get_html(id)
     url = URI.parse("http://pad.helicoid.net/document/#{id}/format/html")
-    request = "<request>#{authentication_block}</request>"
-    doc = REXML::Document.new(send_request(url, request))
+    doc = REXML::Document.new(send_request(url, build_request))
     REXML::XPath.match(doc, "html/child::text()").join.strip
   end
   
   def get_titles
     url = URI.parse("http://pad.helicoid.net/documents/titles")
-    request = "<request>#{authentication_block}</request>"
-    response = REXML::Document.new(send_request(url, request))
+    response = REXML::Document.new(send_request(url, build_request))
     documents = Array.new
     REXML::XPath.match(response, "//document").each do |doc|
       documents.push Document.new(doc)
@@ -184,21 +166,8 @@ class Helipad
     url = URI.parse("http://pad.helicoid.net/document/#{id}/update")
     options = args.extract_options!
     validate_options(options, :update)
-    title = "<title>#{options[:title]}</title>" unless options[:title].nil?
-    tags = "<tags>#{options[:tags]}</tags>" unless options[:tags].nil?
-    source = "<source>#{options[:source]}</source>" unless options[:source].nil?
-    raise(ArgumentError, "No options specified", caller) if (title.nil? and tags.nil? and source.nil?)
-    request = %{
-<request>
-  #{authentication_block}
-  <document>
-    #{title}
-    #{source}
-    #{tags}
-  </document>
-</request>
-    }
-    Response.new(send_request(url, request))
+    raise(ArgumentError, "No options specified", caller) if options.empty?
+    Response.new(send_request(url, build_request(options)))
   end
   
   
@@ -314,6 +283,19 @@ private
   <password>#{@password}</password>
 </authentication>
     }
+  end
+  
+  def build_request(*args)
+    options = args.extract_options!
+    request = "<request>#{authentication_block}"
+    unless options.empty?
+      request << "<document>"
+      options.each_pair do |key, value|
+        request << "<#{key}>#{value}</#{key}>"
+      end
+      request << "</document>"
+    end
+    request << "</request>"
   end
   
   def find_by_tag(tag)
