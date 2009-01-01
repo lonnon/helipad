@@ -1,19 +1,40 @@
-# Ruby interface to the excellent Helipad[http://pad.helicoid.net/home.html] online note pad.
-# 
+# Ruby interface to the excellent Helipad[http://pad.helicoid.net/home.html]
+# online note pad.
+#        
 # Author: Lonnon Foster <lonnon.foster@gmail.com>
-# 
+#        
 # Copyright (c) 2008 Lonnon Foster. All rights reserved.
-# 
+#        
 # == Overview
-# 
-# This file provides three classes for working with Helipad[http://pad.helicoid.net/home.html].
-# 
-# == Examples of Use
+#        
+# This file provides three classes for working with
+# Helipad[http://pad.helicoid.net/home.html]: +Helipad+, <tt>Helipad::Document</tt>, and
+# <tt>Helipad::Response</tt>.
 #
-# All of these examples assume that a Helipad object called +hp+ exists.
+# The +Helipad+ class does all the heavy lifting. Creating an instance of
+# +Helipad+ requires your login credentials.
 #
 #     hp = Helipad.new("lonnon@example.com", "password")
-#     
+#
+# Armed with an instance of +Helipad+, you can call its methods to interact
+# with Helipad[http://pad.helicoid.net/home.html] documents.
+#
+# The <tt>Helipad::Document</tt> class holds the data contained in a
+# Helipad[http://pad.helicoid.net/home.html] document. The +get+ method
+# returns a <tt>Helipad::Document</tt> instance. The +find+, +get_all+, and +get_titles+
+# methods return an Array of <tt>Helipad::Document</tt> instances.
+#
+# The <tt>Helipad::Response</tt> class holds return data sent by
+# Helipad[http://pad.helicoid.net/home.html] that describes the success or
+# failure of various actions. The +create+, +destroy+, and +update+ methods
+# return a <tt>Helipad::Response</tt> instance.
+#        
+# == Examples of Use
+#
+# All of these examples assume that a +Helipad+ object called +hp+ exists.
+#
+#     hp = Helipad.new("lonnon@example.com", "password")
+#            
 # === Getting an Existing Document
 #
 #     document = hp.get(3)
@@ -62,9 +83,9 @@ require 'date'
 # Class +Helipad+ provides a wrapper for the {Helipad XML
 # API}[http://pad.helicoid.net/document/public/6313d317].
 #
-# See the documentation for the file helipad.rb for an overview.
+# See the documentation in the file {helipad.rb}[link:files/lib/helipad_rb.html] for an overview.
 class Helipad
-  # Create a new Helipad object.
+  # Create a new +Helipad+ object.
   #
   # +email+ and +password+ are the same credentials you use to log on to your Helipad account.
   def initialize(email, password)
@@ -74,6 +95,18 @@ class Helipad
     raise(ArgumentError, "Password not specified", caller) if @password.nil?
   end
   
+  # Create a new Helipad[http://pad.helicoid.net/home.html] document.
+  #
+  # +args+ is a hash containing options for the created document.
+  #
+  # ==== Parameters
+  # * <tt>:title</tt> - Title for the new document. This parameter is required.
+  # * <tt>:tags</tt> - Space-separated list of tags for the new document.
+  # * <tt>:source</tt> - Body of the new document.
+  #
+  # ==== Returns
+  # This method returns a <tt>Helipad::Response</tt> object. The response's
+  # <tt>saved?</tt> method returns +true+ if the document was created successfully.
   def create(*args)
     options = args.extract_options!
     validate_options(options, :create)
@@ -93,7 +126,7 @@ class Helipad
   </document>
 </request>
     }
-    Response.new(send_request(url, request)) if title or tags or source
+    Response.new(send_request(url, request))
   end
 
   def destroy(id)
