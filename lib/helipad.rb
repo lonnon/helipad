@@ -147,9 +147,15 @@ class Helipad
   
   # Search for Helipad[http://pad.helicoid.net/home.html] documents by text content or by tags.
   #
+  # ==== Parameters
   # The +find+ method searches differently depending on its arguments:
-  # * If +args+ contains a string, +find+ searches for the string in the titles and bodies of documents.
-  # * If +args+ contains the symbol <tt>:tag</tt>, followed by a string, +find+ searches for documents tagged with that string.
+  # * <tt>find(String)</tt> - Search for the string in the titles and bodies of documents.
+  # * <tt>find(:tag, String)</tt> - Search for documents tagged with the string.
+  #
+  # ==== Returns
+  # This method returns an Array of <tt>Helipad::Document</tt> objects, or +nil+ if nothing
+  # could be found with the given search string. See <tt>Helipad::Document</tt> for more details
+  # about the document object.
   def find(*args)
     raise(ArgumentError, "No find arguments supplied", caller) if args.size == 0
     term = args.extract_search_term!

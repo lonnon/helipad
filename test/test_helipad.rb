@@ -1,11 +1,13 @@
 $:.unshift File.join(File.dirname(__FILE__), "..", "lib")
 require 'helipad'
 require 'test/unit'
+require 'optparse'
 
 class TestHelipad < Test::Unit::TestCase
   def setup
-    @email = "lonnon.foster@gmail.com"
-    @password = "TimP4H"
+    raise(ArgumentError, "Usage: #{$0} -- email password", caller) if ARGV.length != 2
+    @email = ARGV[0]
+    @password = ARGV[1]
     @hp = Helipad.new(@email, @password)
   end
   
