@@ -7,6 +7,9 @@ task :docs do |t|
 end
 
 task :test, [:email, :password] do |t, args|
+  if args.email.nil? or args.password.nil?
+    raise(ArgumentError, 'Usage: rake "test[email, password]"', caller)
+  end
   sh "ruby test/test_helipad.rb -- #{args.email} #{args.password}"
 end
 
