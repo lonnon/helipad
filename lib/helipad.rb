@@ -97,7 +97,7 @@ class Helipad
   
   # Create a new Helipad[http://pad.helicoid.net/home.html] document.
   #
-  # +args+ is a hash containing options for the created document.
+  # +args+ is a Hash containing options for the created document.
   #
   # ==== Parameters
   # * <tt>:title</tt> - Title for the new document. This parameter is
@@ -108,15 +108,16 @@ class Helipad
   #   which you can use to format the document's text.
   #
   # ==== Returns
-  # This method returns a <tt>Helipad::Response</tt> object. The response's
-  # <tt>saved?</tt> method returns +true+ if the document was created
-  # successfully.
+  # This method returns a <tt>Helipad::Response</tt> object, which has the following methods:
+  # * <tt>saved?</tt> - +true+ if the document was created successfully
+  # * +doc_id+ - ID of the newly created document
   #
   # ==== Example
-  #     hp = Helipad.new("lonnon.example.com", "password")
+  #     hp = Helipad.new("lonnon@example.com", "password")
   #     response = hp.create(:title => "Marsupial Inventory",
   #                          :tags  => "marsupial australia animals",
   #                          :source => "|koala|2|\n|kangaroo|8|\n|platypus|1|")
+  #     puts "Inventory saved as document #{response.doc_id}" if response.saved?
   def create(*args)
     options = args.extract_options!
     validate_options(options, :create)
@@ -126,11 +127,29 @@ class Helipad
     Response.new(send_request(url, build_request(options)))
   end
 
+  # Delete a Helipad[http://pad.helicoid.net/home.html] document.
+  #
+  # ==== Parameters
+  # * +id+ - ID of the document to delete.
+  #
+  # ==== Returns
+  # This method returns a <tt>Helipad::Response</tt> object, which has the following method:
+  # * <tt>deleted?</tt> - +true+ if the document was deleted successfully
+  #
+  # ==== Example
+  #     hp = Helipad.new("lonnon@example.com", "password")
+  #     response = hp.destroy(81)
+  #     puts "Document deleted" if response.deleted?
   def destroy(id)
     url = URI.parse("http://pad.helicoid.net/document/#{id}/destroy")
     Response.new(send_request(url, build_request))
   end
   
+  # Search for Helipad[http://pad.helicoid.net/home.html] documents by text content or by tags.
+  #
+  # The +find+ method searches differently depending on its arguments:
+  # * If +args+ contains a string, +find+ searches for the string in the titles and bodies of documents.
+  # * If +args+ contains the symbol <tt>:tag</tt>, followed by a string, +find+ searches for documents tagged with that string.
   def find(*args)
     raise(ArgumentError, "No find arguments supplied", caller) if args.size == 0
     term = args.extract_search_term!
@@ -141,11 +160,38 @@ class Helipad
     end
   end
   
+  # Retrieve a Helipad[http://pad.helicoid.net/home.html] document.
+  #
+  # ==== Parameters
+  # * +id+ - ID of the document to retrieve.
+  #
+  # ==== Returns
+  # This method returns a <tt>Helipad::Document</tt> object, which holds the contents and
+  # properties of the document. See <tt>Helipad::Document</tt> for more details about the
+  # document object.
+  #
+  # ==== Example
+  #     hp = Helipad.new("lonnon@example.com", "password")
+  #     document = hp.get(29)
+  #     puts "#{document.title} contains #{document.source.length} characters."
   def get(id)
     url = URI.parse("http://pad.helicoid.net/document/#{id}/get")
     Document.new(send_request(url, build_request))
   end
   
+  # Retrieve all documents on a Helipad[http://pad.helicoid.net/home.html]
+  # account.
+  #
+  # ==== Returns
+  # This method returns an Array of <tt>Helipad::Document</tt> objects. See
+  # <tt>Helipad::Document</tt> for more details about the document object.
+  #
+  # ==== Example
+  #     hp = Helipad.new("lonnon@example.com", "password")
+  #     puts "Table of Contents"
+  #     hp.get_all.each do |doc|
+  #       puts doc.title
+  #     end
   def get_all
     url = URI.parse("http://pad.helicoid.net/")
     response = REXML::Document.new(send_request(url, build_request))
