@@ -156,6 +156,14 @@ class Helipad
   # This method returns an Array of <tt>Helipad::Document</tt> objects, or +nil+ if nothing
   # could be found with the given search string. See <tt>Helipad::Document</tt> for more details
   # about the document object.
+  #
+  # ==== Examples
+  #     hp = Helipad.new("lonnon@example.com", "password")
+  #     docs = hp.find("wibble")
+  #     puts "#{docs.size} documents contain 'wibble'"
+  #
+  #     docs = hp.find(:tag, "diary")
+  #     puts "First diary entry is titled '#{docs.first.title}'"
   def find(*args)
     raise(ArgumentError, "No find arguments supplied", caller) if args.size == 0
     term = args.extract_search_term!
