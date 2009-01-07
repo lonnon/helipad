@@ -87,6 +87,7 @@ require 'date'
 class Helipad
   # Create a new +Helipad+ object.
   #
+  # ==== Parameters
   # +email+ and +password+ are the same credentials you use to log on to your Helipad account.
   def initialize(email, password)
     @email = email
@@ -97,12 +98,12 @@ class Helipad
   
   # Create a new Helipad[http://pad.helicoid.net/home.html] document.
   #
-  # +args+ is a Hash containing options for the created document.
-  #
   # ==== Parameters
+  # +args+ is a Hash containing properties for the created document.
+  #
   # * <tt>:title</tt> - Title for the new document. This parameter is
   #   required.
-  # * <tt>:tags</tt> - Space-separated list of tags for the new document.
+  # * <tt>:tags</tt> - Space-separated list of tags for the new document
   # * <tt>:source</tt> - Body of the new document.
   #   Helipad[http://pad.helicoid.net/home.html] understands {Textile markup}[http://pad.helicoid.net/formatting],
   #   which you can use to format the document's text.
@@ -129,8 +130,8 @@ class Helipad
 
   # Delete a Helipad[http://pad.helicoid.net/home.html] document.
   #
-  # ==== Parameters
-  # * +id+ - ID of the document to delete.
+  # ==== Parameter
+  # * +id+ - ID of the document to delete
   #
   # ==== Returns
   # This method returns a <tt>Helipad::Response</tt> object, which has the following method:
@@ -176,8 +177,8 @@ class Helipad
   
   # Retrieve a Helipad[http://pad.helicoid.net/home.html] document.
   #
-  # ==== Parameters
-  # * +id+ - ID of the document to retrieve.
+  # ==== Parameter
+  # * +id+ - ID of the document to retrieve
   #
   # ==== Returns
   # This method returns a <tt>Helipad::Document</tt> object, which holds the contents and
@@ -202,9 +203,12 @@ class Helipad
   #
   # ==== Example
   #     hp = Helipad.new("lonnon@example.com", "password")
-  #     puts "Table of Contents"
-  #     hp.get_all.each do |doc|
-  #       puts doc.title
+  #     docs = hp.get_all
+  #     case docs.size
+  #       when > 1000 then puts "Slow down there, Shakespeare!"
+  #       when >  100 then puts "That's a respectable amount of writing."
+  #       when >   10 then puts "Keep at it!"
+  #       else             puts "Do you even use your Helipad account?"
   #     end
   def get_all
     url = URI.parse("http://pad.helicoid.net/")
@@ -216,12 +220,35 @@ class Helipad
     documents
   end
 
+  # Retrieve an HTML-formatted version of a Helipad[http://pad.helicoid.net/home.html] document.
+  #
+  # ==== Parameter
+  # * +id+ - ID of the document to retrieve
+  #
+  # ==== Returns
+  # This method returns a String containing the HTML-formatted document.
+  #
+  # ==== Example
+  #     hp = Helipad.new("lonnon@example.com", "password")
+  #     puts hp.get_html(94)
   def get_html(id)
     url = URI.parse("http://pad.helicoid.net/document/#{id}/format/html")
     doc = REXML::Document.new(send_request(url, build_request))
     REXML::XPath.match(doc, "html/child::text()").join.strip
   end
   
+  # Retrieve a list of all the document titles in a Helipad[http://pad.helicoid.net/home.html] account.
+  #
+  # ==== Returns
+  # This method returns an Array of <tt>Helipad::Document</tt> objects that contain titles, but
+  # no document source. See <tt>Helipad::Document</tt> for more details about the document object.
+  #
+  # ==== Example
+  #     hp = Helipad.new("lonnon@example.com", "password")
+  #     puts "Table of Contents"
+  #     hp.get_titles.each do |doc|
+  #       puts doc.title
+  #     end
   def get_titles
     url = URI.parse("http://pad.helicoid.net/documents/titles")
     response = REXML::Document.new(send_request(url, build_request))
@@ -232,6 +259,29 @@ class Helipad
     documents
   end
   
+  # Update an existing Helipad[http://pad.helicoid.net/home.html] document.
+  #
+  # ==== Parameters
+  # +id+ is the ID of the document to be updated.
+  #
+  # +args+ is a Hash containing properties to update in the document. All of the properties
+  # are optional.
+  #
+  # * <tt>:title</tt> - Updated title for the document
+  # * <tt>:tags</tt> - Space-separated list of tags for the document
+  # * <tt>:source</tt> - Updated body of the document.
+  #   Helipad[http://pad.helicoid.net/home.html] understands {Textile markup}[http://pad.helicoid.net/formatting],
+  #   which you can use to format the document's text.
+  #
+  # ==== Returns
+  # This method returns a <tt>Helipad::Response</tt> object, which has the following method:
+  # * <tt>saved?</tt> - +true+ if the document was created successfully
+  #
+  # ==== Example
+  #     hp = Helipad.new("lonnon@example.com", "password")
+  #     response = hp.update(:title => "Marsupial Inventory (amended)",
+  #                          :source => "|koala|2|\n|kangaroo|2|\n|platypus|19|")
+  #     puts "Inventory updated" if response.saved?
   def update(id, *args)
     url = URI.parse("http://pad.helicoid.net/document/#{id}/update")
     options = args.extract_options!
@@ -241,8 +291,34 @@ class Helipad
   end
   
   
+  # Contains the properties and data that make up a Helipad[http://pad.helicoid.net/home.html] document.
+  #
+  # Various +Helipad+ methods create and return <tt>Helipad::Document</tt> objects; there is
+  # probably little reason to make an instance of <tt>Helipad::Document</tt> in your own code.
+  #
+  # The class contains a number of read-only methods for retrieving a document's properties. Depending
+  # on which +Helipad+ method created the <tt>Helipad::Document</tt> object, some of these methods may
+  # not be present. For example, the <tt>Helipad.get_titles</tt> method leaves out the +source+
+  # attribute.
+  # * +doc_id+ - ID of the document
+  # * +title+ - Title of the document
+  # * +source+ - Body of the document. Helipad[http://pad.helicoid.net/home.html] understands
+  #   {Textile markup}[http://pad.helicoid.net/formatting],
+  #   which you can use to format the document's text.
+  # * +tags+ - An Array containing the document's tags, each of which is a String
+  # * +created_on+ - A DateTime object containing the creation time of the document
+  # * +updated_on+ - A DateTime object containing the document's last modification time
+  # * +share+ - The URL where the document is shared, or +nil+ if the document is not shared
+  # * <tt>approved?</tt> - Not sure what this means, but it's +true+ if the document's "approved"
+  #   property is true, and +false+ otherwise.
+  # * <tt>dangerous?</tt> - Also unsure what this means, but it's +true+ if the document's "dangerous"
+  #   property is true, and +false+ otherwise.
+  # * +raw_response+ - The raw XML response returned by Helipad[http://pad.helicoid.net/home.html].
+  #   This could be useful if, for some reason, you want to parse the results yourself. See the
+  #   {Helipad API documentation}[http://pad.helicoid.net/document/public/6313d317] for more
+  #   information.
   class Document
-    def initialize(source)
+    def initialize(source) #:nodoc:
       if source.kind_of? REXML::Element
         doc = REXML::Document.new(source.to_s)
       else
@@ -267,7 +343,7 @@ class Helipad
           if tag.attributes["nil"] == "true"
             value = nil
           else
-            value = tag.text
+            value = "http://pad.helicoid.net/document/public/#{tag.text}"
           end
         when "source"
           name = "source"
@@ -307,8 +383,27 @@ class Helipad
     end
   end
 
+
+  # Contains the data returned by Helipad[http://pad.helicoid.net/home.html] in response to certain
+  # API calls.
+  #
+  # Various +Helipad+ methods create and return <tt>Helipad::Response</tt> objects; there is
+  # probably little reason to make an instance of <tt>Helipad::Response</tt> in your own code.
+  #
+  # The class contains a number of read-only methods for retrieving a response's properties. Depending
+  # on which +Helipad+ method created the <tt>Helipad::Response</tt> object, some of these methods may
+  # not be present. For example, the <tt>Helipad.update</tt> method leaves out the +doc_id+
+  # attribute, and <tt>Helipad.destroy</tt> doesn't use the <tt>saved?</tt> method.
+  # * +doc_id+ - ID of the document associated with the response. <tt>Helipad.create</tt> returns this
+  #   to let you know the ID of the document it just created.
+  # * <tt>saved?</tt> - +true+ if the document was saved succesfully, otherwise +false+
+  # * <tt>deleted?</tt> - +true+ if the document was deleted successfully, otherwise +false+
+  # * +raw_response+ - The raw XML response returned by Helipad[http://pad.helicoid.net/home.html].
+  #   This could be useful if, for some reason, you want to parse the results yourself. See the
+  #   {Helipad API documentation}[http://pad.helicoid.net/document/public/6313d317] for more
+  #   information.
   class Response
-    def initialize(raw_response)
+    def initialize(raw_response) #:nodoc:
       doc = REXML::Document.new raw_response
       REXML::XPath.match(doc, "//*").each do |tag|
         suffix = ""
@@ -404,8 +499,8 @@ private
     end
   end
   
-  VALID_CREATE_OPTIONS = [:title, :source, :tags]
-  VALID_UPDATE_OPTIONS = [:title, :source, :tags]
+  VALID_CREATE_OPTIONS = [:title, :source, :tags] #:nodoc:
+  VALID_UPDATE_OPTIONS = [:title, :source, :tags] #:nodoc:
   
   def validate_options(options, action)
     case action
@@ -416,8 +511,7 @@ private
   end
 end
 
-
-class Array
+class Array #:nodoc: all
   def extract_options!
     last.is_a?(::Hash) ? pop : {}
   end
@@ -427,8 +521,7 @@ class Array
   end
 end
 
-
-class Hash
+class Hash #:nodoc: all
   def assert_valid_keys(*valid_keys)
     unknown_keys = keys - [valid_keys].flatten
     raise(ArgumentError, "Unknown key(s): #{unknown_keys.join(", ")}") unless unknown_keys.empty?
