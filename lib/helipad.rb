@@ -1,3 +1,8 @@
+#--
+# Copyright (c) 2008 Lonnon Foster. All rights reserved.
+# See README for permissions.
+#++
+
 require 'net/http'
 require 'uri'
 require 'rexml/document'
