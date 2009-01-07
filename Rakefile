@@ -1,6 +1,26 @@
 require 'rubygems'
 require 'rake/gempackagetask'
 
+spec = Gem::Specification.new do |s|
+  s.name     = "Helipad"
+  s.version  = "1.0.0"
+  s.author   = "Lonnon Foster"
+  s.email    = "lonnon.foster@gmail.com"
+  s.homepage = "http://nyerm.com/helipad"
+  s.platform = Gem::Platform::RUBY
+  s.summary  = "Ruby interface to the excellent Helipad online notepad"
+  s.files    = FileList["{lib,test,doc}/**/*"].to_a
+  s.require_path = "lib"
+  s.autorequire  = "helipad"
+  s.test_file    = "test/test_helipad.rb"
+  s.has_rdoc = true
+end
+
+Rake::GemPackageTask.new(spec) do |pkg|
+  pkg.need_tar = true
+  pkg.need_zip = true
+end
+
 desc "Remove all generated files"
 task :clobber => [:clobber_rdoc, :clobber_package]
 
@@ -25,25 +45,5 @@ task :test, [:email, :password] do |t, args|
     raise(ArgumentError, 'Usage: rake "test[email, password]"', caller)
   end
   sh "ruby test/test_helipad.rb -- #{args.email} #{args.password}"
-end
-
-spec = Gem::Specification.new do |s|
-  s.name     = "Helipad"
-  s.version  = "1.0.0"
-  s.author   = "Lonnon Foster"
-  s.email    = "lonnon.foster@gmail.com"
-  s.homepage = "http://nyerm.com/helipad"
-  s.platform = Gem::Platform::RUBY
-  s.summary  = "Ruby interface to the excellent Helipad online notepad"
-  s.files    = FileList["{lib, test, doc}/**/*"].to_a
-  s.require_path = "lib"
-  s.autorequire  = "helipad"
-  s.test_file    = "test/test_helipad.rb"
-  s.has_rdoc = true
-end
-
-Rake::GemPackageTask.new(spec) do |pkg|
-  pkg.need_tar = true
-  pkg.need_zip = true
 end
 
