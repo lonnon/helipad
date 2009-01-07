@@ -8,30 +8,30 @@
 # == Overview
 #        
 # This file provides three classes for working with
-# Helipad[http://pad.helicoid.net/home.html]: +Helipad+, <tt>Helipad::Document</tt>, and
-# <tt>Helipad::Response</tt>.
+# Helipad[http://pad.helicoid.net/home.html]: Helipad, Helipad::Document, and
+# Helipad::Response.
 #
-# The +Helipad+ class does all the heavy lifting. Creating an instance of
-# +Helipad+ requires your login credentials.
+# The Helipad class does all the heavy lifting. Creating an instance of
+# Helipad requires your login credentials.
 #
 #     hp = Helipad.new("lonnon@example.com", "password")
 #
-# Armed with an instance of +Helipad+, you can call its methods to interact
+# Armed with an instance of Helipad, you can call its methods to interact
 # with Helipad[http://pad.helicoid.net/home.html] documents.
 #
-# The <tt>Helipad::Document</tt> class holds the data contained in a
-# Helipad[http://pad.helicoid.net/home.html] document. The +get+ method
-# returns a <tt>Helipad::Document</tt> instance. The +find+, +get_all+, and +get_titles+
-# methods return an Array of <tt>Helipad::Document</tt> instances.
+# The Helipad::Document class holds the data contained in a
+# Helipad[http://pad.helicoid.net/home.html] document. The get method
+# returns a Helipad::Document instance. The find, get_all, and get_titles
+# methods return an Array of Helipad::Document instances.
 #
-# The <tt>Helipad::Response</tt> class holds return data sent by
+# The Helipad::Response class holds return data sent by
 # Helipad[http://pad.helicoid.net/home.html] that describes the success or
-# failure of various actions. The +create+, +destroy+, and +update+ methods
-# return a <tt>Helipad::Response</tt> instance.
+# failure of various actions. The create, destroy, and update methods
+# return a Helipad::Response instance.
 #        
 # == Examples of Use
 #
-# All of these examples assume that a +Helipad+ object called +hp+ exists.
+# All of these examples assume that a Helipad object called +hp+ exists.
 #
 #     hp = Helipad.new("lonnon@example.com", "password")
 #            
@@ -80,12 +80,12 @@ require 'uri'
 require 'rexml/document'
 require 'date'
 
-# Class +Helipad+ provides a wrapper for the {Helipad XML
+# Class Helipad provides a wrapper for the {Helipad XML
 # API}[http://pad.helicoid.net/document/public/6313d317].
 #
 # See the documentation in the file {helipad.rb}[link:files/lib/helipad_rb.html] for an overview.
 class Helipad
-  # Create a new +Helipad+ object.
+  # Create a new Helipad object.
   #
   # ==== Parameters
   # +email+ and +password+ are the same credentials you use to log on to your Helipad account.
@@ -109,7 +109,7 @@ class Helipad
   #   which you can use to format the document's text.
   #
   # ==== Returns
-  # This method returns a <tt>Helipad::Response</tt> object, which has the following methods:
+  # This method returns a Helipad::Response object, which has the following methods:
   # * <tt>saved?</tt> - +true+ if the document was created successfully
   # * +doc_id+ - ID of the newly created document
   #
@@ -134,7 +134,7 @@ class Helipad
   # * +id+ - ID of the document to delete
   #
   # ==== Returns
-  # This method returns a <tt>Helipad::Response</tt> object, which has the following method:
+  # This method returns a Helipad::Response object, which has the following method:
   # * <tt>deleted?</tt> - +true+ if the document was deleted successfully
   #
   # ==== Example
@@ -149,14 +149,14 @@ class Helipad
   # Search for Helipad[http://pad.helicoid.net/home.html] documents by text content or by tags.
   #
   # ==== Parameters
-  # The +find+ method searches differently depending on its arguments:
+  # The find method searches differently depending on its arguments:
   # * <tt>find(String)</tt> - Search for the string in the titles and bodies of documents.
   # * <tt>find(:tag, String)</tt> - Search for documents tagged with the string.
   #
   # ==== Returns
-  # This method returns an Array of <tt>Helipad::Document</tt> objects, or +nil+ if nothing
-  # could be found with the given search string. See <tt>Helipad::Document</tt> for more details
-  # about the document object.
+  # This method returns an Array of Helipad::Document objects, or +nil+ if nothing
+  # could be found matching the given search string. See Helipad::Document for more details
+  # about the Document object.
   #
   # ==== Examples
   #     hp = Helipad.new("lonnon@example.com", "password")
@@ -181,9 +181,9 @@ class Helipad
   # * +id+ - ID of the document to retrieve
   #
   # ==== Returns
-  # This method returns a <tt>Helipad::Document</tt> object, which holds the contents and
-  # properties of the document. See <tt>Helipad::Document</tt> for more details about the
-  # document object.
+  # This method returns a Helipad::Document object, which holds the contents and
+  # properties of the document. See Helipad::Document for more details about the
+  # Document object.
   #
   # ==== Example
   #     hp = Helipad.new("lonnon@example.com", "password")
@@ -198,8 +198,8 @@ class Helipad
   # account.
   #
   # ==== Returns
-  # This method returns an Array of <tt>Helipad::Document</tt> objects. See
-  # <tt>Helipad::Document</tt> for more details about the document object.
+  # This method returns an Array of Helipad::Document objects. See
+  # Helipad::Document for more details about the document object.
   #
   # ==== Example
   #     hp = Helipad.new("lonnon@example.com", "password")
@@ -240,8 +240,8 @@ class Helipad
   # Retrieve a list of all the document titles in a Helipad[http://pad.helicoid.net/home.html] account.
   #
   # ==== Returns
-  # This method returns an Array of <tt>Helipad::Document</tt> objects that contain titles, but
-  # no document source. See <tt>Helipad::Document</tt> for more details about the document object.
+  # This method returns an Array of Helipad::Document objects that contain titles, but
+  # no document source. See Helipad::Document for more details about the Document object.
   #
   # ==== Example
   #     hp = Helipad.new("lonnon@example.com", "password")
@@ -274,7 +274,7 @@ class Helipad
   #   which you can use to format the document's text.
   #
   # ==== Returns
-  # This method returns a <tt>Helipad::Response</tt> object, which has the following method:
+  # This method returns a Helipad::Response object, which has the following method:
   # * <tt>saved?</tt> - +true+ if the document was created successfully
   #
   # ==== Example
@@ -293,12 +293,12 @@ class Helipad
   
   # Contains the properties and data that make up a Helipad[http://pad.helicoid.net/home.html] document.
   #
-  # Various +Helipad+ methods create and return <tt>Helipad::Document</tt> objects; there is
-  # probably little reason to make an instance of <tt>Helipad::Document</tt> in your own code.
+  # Various Helipad methods create and return Helipad::Document objects; there is
+  # probably little reason to make an instance of Helipad::Document in your own code.
   #
   # The class contains a number of read-only methods for retrieving a document's properties. Depending
-  # on which +Helipad+ method created the <tt>Helipad::Document</tt> object, some of these methods may
-  # not be present. For example, the <tt>Helipad.get_titles</tt> method leaves out the +source+
+  # on which Helipad method created the Helipad::Document object, some of these methods may
+  # not be present. For example, the Helipad.get_titles method leaves out the +source+
   # attribute.
   # * +doc_id+ - ID of the document
   # * +title+ - Title of the document
@@ -387,14 +387,14 @@ class Helipad
   # Contains the data returned by Helipad[http://pad.helicoid.net/home.html] in response to certain
   # API calls.
   #
-  # Various +Helipad+ methods create and return <tt>Helipad::Response</tt> objects; there is
-  # probably little reason to make an instance of <tt>Helipad::Response</tt> in your own code.
+  # Various Helipad methods create and return Helipad::Response objects; there is
+  # probably little reason to make an instance of Helipad::Response in your own code.
   #
   # The class contains a number of read-only methods for retrieving a response's properties. Depending
-  # on which +Helipad+ method created the <tt>Helipad::Response</tt> object, some of these methods may
-  # not be present. For example, the <tt>Helipad.update</tt> method leaves out the +doc_id+
-  # attribute, and <tt>Helipad.destroy</tt> doesn't use the <tt>saved?</tt> method.
-  # * +doc_id+ - ID of the document associated with the response. <tt>Helipad.create</tt> returns this
+  # on which Helipad method created the Helipad::Response object, some of these methods may
+  # not be present. For example, the Helipad.update method leaves out the +doc_id+
+  # attribute, and Helipad.destroy doesn't use the <tt>saved?</tt> method.
+  # * +doc_id+ - ID of the document associated with the response. Helipad.create returns this
   #   to let you know the ID of the document it just created.
   # * <tt>saved?</tt> - +true+ if the document was saved succesfully, otherwise +false+
   # * <tt>deleted?</tt> - +true+ if the document was deleted successfully, otherwise +false+
