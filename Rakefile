@@ -3,17 +3,21 @@ require 'rake/gempackagetask'
 
 spec = Gem::Specification.new do |s|
   s.name     = "Helipad"
-  s.version  = "1.0.0"
+  s.version  = "0.0.1"
   s.author   = "Lonnon Foster"
   s.email    = "lonnon.foster@gmail.com"
   s.homepage = "http://nyerm.com/helipad"
   s.platform = Gem::Platform::RUBY
   s.summary  = "Ruby interface to the excellent Helipad online notepad"
-  s.files    = FileList["{lib,test,doc}/**/*"].to_a
+  s.files    = FileList["{lib,test}/**/*", "README"].to_a
   s.require_path = "lib"
-  s.autorequire  = "helipad"
   s.test_file    = "test/test_helipad.rb"
-  s.has_rdoc = true
+  s.has_rdoc     = true
+  s.rdoc_options << "--title" << "Helipad Documentation" <<
+                    "--main"  << "README" <<
+                    "--inline-source"
+  s.extra_rdoc_files << "README"
+  s.rubyforge_project = "helipad"
 end
 
 Rake::GemPackageTask.new(spec) do |pkg|
@@ -31,12 +35,12 @@ end
 
 desc "Build the rdoc HTML files"
 task :rdoc do |t|
-  sh "rdoc lib --main lib/helipad.rb --title 'Helipad Documentation' --inline-source"
+  sh "rdoc #{spec.rdoc_options.join(" ")} lib README"
 end
 
 desc "Force a rebuild of the rdoc files"
 task :rerdoc do |t|
-  sh "rdoc lib --main lib/helipad.rb --title 'Helipad Documentation' --inline-source --force-update"
+  sh "rdoc #{spec.rdoc_options.join(" ")} --force-update lib README"
 end
 
 desc "Run tests"

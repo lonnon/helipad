@@ -1,80 +1,3 @@
-# Ruby interface to the excellent Helipad[http://pad.helicoid.net/home.html]
-# online note pad.
-#        
-# Author: Lonnon Foster <lonnon.foster@gmail.com>
-#        
-# Copyright (c) 2008 Lonnon Foster. All rights reserved.
-#        
-# == Overview
-#        
-# This file provides three classes for working with
-# Helipad[http://pad.helicoid.net/home.html]: Helipad, Helipad::Document, and
-# Helipad::Response.
-#
-# The Helipad class does all the heavy lifting. Creating an instance of
-# Helipad requires your login credentials.
-#
-#     hp = Helipad.new("lonnon@example.com", "password")
-#
-# Armed with an instance of Helipad, you can call its methods to interact
-# with Helipad[http://pad.helicoid.net/home.html] documents.
-#
-# The Helipad::Document class holds the data contained in a
-# Helipad[http://pad.helicoid.net/home.html] document. The get method
-# returns a Helipad::Document instance. The find, get_all, and get_titles
-# methods return an Array of Helipad::Document instances.
-#
-# The Helipad::Response class holds return data sent by
-# Helipad[http://pad.helicoid.net/home.html] that describes the success or
-# failure of various actions. The create, destroy, and update methods
-# return a Helipad::Response instance.
-#        
-# == Examples of Use
-#
-# All of these examples assume that a Helipad object called +hp+ exists.
-#
-#     hp = Helipad.new("lonnon@example.com", "password")
-#            
-# === Getting an Existing Document
-#
-#     document = hp.get(3)
-#     puts document.source
-#
-# === Get a Document Formatted as HTML
-#
-#     puts hp.get_html(3)
-#
-# === Finding Documents
-#
-#     def how_many(search_term)
-#       documents = hp.find(search_term)
-#       documents.size
-#     end
-#
-#     find_this = "wombats"
-#     puts "#{how_many(find_this)} document(s) were found containing '#{find_this}'."
-#
-# === Finding Documents by Tags
-#
-#     documents = hp.find(:tag, "work")
-#     titles = documents.collect { |doc| doc.title }
-#     puts "Documents tagged with 'work':\n  #{titles.join("\n  ")}"
-#
-# === Creating a Document
-#
-#     source = File.read("cake_recipe.txt")
-#     response = hp.create(:title  => "Delicious Chocolate Cake",
-#                          :tags   => "recipe dessert",
-#                          :source => source)
-#     puts "Recipe saved" if response.saved?
-#
-# === Delete Documents
-#
-#     doc_ids = hp.find(:tag, "incriminating").collect { |doc| doc.doc_id }
-#     doc_ids.each do |id|
-#       hp.destroy(id)
-#     end
-
 require 'net/http'
 require 'uri'
 require 'rexml/document'
@@ -83,7 +6,7 @@ require 'date'
 # Class Helipad provides a wrapper for the {Helipad XML
 # API}[http://pad.helicoid.net/document/public/6313d317].
 #
-# See the documentation in the file {helipad.rb}[link:files/lib/helipad_rb.html] for an overview.
+# See the documentation in the file README for an overview.
 class Helipad
   # Create a new Helipad object.
   #

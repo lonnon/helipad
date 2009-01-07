@@ -1,0 +1,96 @@
+# Ruby interface to the excellent Helipad[http://pad.helicoid.net/home.html]
+# online note pad.
+#        
+# Author: Lonnon Foster (lonnon.foster@gmail.com)
+#        
+# == Overview
+#        
+# This package provides three classes for working with
+# Helipad[http://pad.helicoid.net/home.html]: Helipad, Helipad::Document, and
+# Helipad::Response.
+#
+# The Helipad class does all the heavy lifting. Creating an instance of
+# Helipad requires your login credentials.
+#
+#     hp = Helipad.new("lonnon@example.com", "password")
+#
+# Armed with an instance of Helipad, you can call its methods to interact
+# with Helipad[http://pad.helicoid.net/home.html] documents.
+#
+# The Helipad::Document class holds the data contained in a
+# Helipad[http://pad.helicoid.net/home.html] document. The get method
+# returns a Helipad::Document instance. The find, get_all, and get_titles
+# methods return an Array of Helipad::Document instances.
+#
+# The Helipad::Response class holds return data sent by
+# Helipad[http://pad.helicoid.net/home.html] that describes the success or
+# failure of various actions. The create, destroy, and update methods
+# return a Helipad::Response instance.
+#        
+# == Examples of Use
+#
+# All of these examples assume that a Helipad object called +hp+ exists.
+#
+#     hp = Helipad.new("lonnon@example.com", "password")
+#            
+# === Get an Existing Document
+#
+#     document = hp.get(3)
+#     puts document.source
+#
+# === Get a Document Formatted as HTML
+#
+#     puts hp.get_html(3)
+#
+# === Find Documents
+#
+#     def how_many(search_term)
+#       documents = hp.find(search_term)
+#       documents.size
+#     end
+#
+#     find_this = "wombats"
+#     puts "#{how_many(find_this)} document(s) were found containing '#{find_this}'."
+#
+# === Find Documents by Tags
+#
+#     documents = hp.find(:tag, "work")
+#     titles = documents.collect { |doc| doc.title }
+#     puts "Documents tagged with 'work':\n  #{titles.join("\n  ")}"
+#
+# === Create a Document
+#
+#     source = File.read("cake_recipe.txt")
+#     response = hp.create(:title  => "Delicious Chocolate Cake",
+#                          :tags   => "recipe dessert",
+#                          :source => source)
+#     puts "Recipe saved" if response.saved?
+#
+# === Delete Documents
+#
+#     doc_ids = hp.find(:tag, "incriminating").collect { |doc| doc.doc_id }
+#     doc_ids.each do |id|
+#       hp.destroy(id)
+#     end
+#
+# == Legal
+#
+# Copyright (c) 2008 Lonnon Foster
+#        
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
