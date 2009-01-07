@@ -35,12 +35,12 @@ end
 
 desc "Build the rdoc HTML files"
 task :rdoc do |t|
-  sh "rdoc #{spec.rdoc_options.join(" ")} lib README"
+  sh "rdoc #{quote_options(spec.rdoc_options).join(" ")} lib README"
 end
 
 desc "Force a rebuild of the rdoc files"
 task :rerdoc do |t|
-  sh "rdoc #{spec.rdoc_options.join(" ")} --force-update lib README"
+  sh "rdoc #{quote_options(spec.rdoc_options).join(" ")} --force-update lib README"
 end
 
 desc "Run tests"
@@ -51,3 +51,13 @@ task :test, [:email, :password] do |t, args|
   sh "ruby test/test_helipad.rb -- #{args.email} #{args.password}"
 end
 
+
+def quote_options(options)
+  options.collect do |option|
+    if option =~ /\s/
+      %{"#{option}"}
+    else
+      option
+    end
+  end
+end
