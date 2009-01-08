@@ -18,6 +18,8 @@ spec = Gem::Specification.new do |s|
                     "--inline-source"
   s.extra_rdoc_files << "README"
   s.rubyforge_project = "helipad"
+  s.signing_key = "/Volume/stuff/gem-certs/gem-private_key.pem"
+  s.cert_chain  = "/Volume/stuff/gem-certs/gem-public_cert.pem"
 end
 
 Rake::GemPackageTask.new(spec) do |pkg|
