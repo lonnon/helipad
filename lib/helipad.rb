@@ -237,9 +237,9 @@ class Helipad
   # * +created_on+ - A DateTime object containing the creation time of the document
   # * +updated_on+ - A DateTime object containing the document's last modification time
   # * +share+ - The URL where the document is shared, or +nil+ if the document is not shared
-  # * <tt>approved?</tt> - Not sure what this means, but it's +true+ if the document's "approved"
-  #   property is true, and +false+ otherwise.
-  # * <tt>dangerous?</tt> - Also unsure what this means, but it's +true+ if the document's "dangerous"
+  # * <tt>approved?</tt> - +true+ if the document contains a plugin approved by
+  #   Helipad[http://pad.helicoid.net/home.html] staff; +false+ otherwise.
+  # * <tt>dangerous?</tt> - I don't know what this means, but it's +true+ if the document's "dangerous"
   #   property is true, and +false+ otherwise.
   # * +raw_response+ - The raw XML response returned by Helipad[http://pad.helicoid.net/home.html].
   #   This could be useful if, for some reason, you want to parse the results yourself. See the
