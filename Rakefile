@@ -16,8 +16,6 @@ begin
                       "--inline-source"
     s.extra_rdoc_files << "README"
     s.rubyforge_project = "helipad"
-    s.signing_key = "/Volumes/STUFF/gem-certs/gem-private_key.pem"
-    s.cert_chain  = "/Volumes/STUFF/gem-certs/gem-public_cert.pem"
   end
 rescue LoadError
   puts "Jeweler not available. Install it with:"
