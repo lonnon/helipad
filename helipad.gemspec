@@ -6,7 +6,6 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Lonnon Foster"]
-  s.cert_chain = %q{/Volumes/STUFF/gem-certs/gem-public_cert.pem}
   s.date = %q{2009-03-06}
   s.email = %q{lonnon.foster@gmail.com}
   s.extra_rdoc_files = ["README"]
@@ -17,7 +16,6 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   s.rubyforge_project = %q{helipad}
   s.rubygems_version = %q{1.3.1}
-  s.signing_key = %q{/Volumes/STUFF/gem-certs/gem-private_key.pem}
   s.summary = %q{Ruby interface to the excellent Helipad online notepad}
   s.test_files = ["test/test_helipad.rb"]
 
