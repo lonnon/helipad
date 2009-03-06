@@ -1,3 +1,6 @@
+require 'rubygems'
+require 'rake/gempackagetask'
+
 spec = Gem::Specification.new do |s|
   s.name     = "Helipad"
   s.version  = "0.0.1"
