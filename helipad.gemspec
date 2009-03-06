@@ -1,23 +1,33 @@
-require 'rubygems'
-require 'rake/gempackagetask'
+# -*- encoding: utf-8 -*-
 
-spec = Gem::Specification.new do |s|
-  s.name     = "Helipad"
-  s.version  = "0.0.1"
-  s.author   = "Lonnon Foster"
-  s.email    = "lonnon.foster@gmail.com"
-  s.homepage = "http://nyerm.com/helipad"
-  s.platform = Gem::Platform::RUBY
-  s.summary  = "Ruby interface to the excellent Helipad online notepad"
-  s.files    = FileList["{lib,test}/**/*", "README"].to_a
-  s.require_path = "lib"
-  s.test_file    = "test/test_helipad.rb"
-  s.has_rdoc     = true
-  s.rdoc_options << "--title" << "Helipad Documentation" <<
-                    "--main"  << "README" <<
-                    "--inline-source"
-  s.extra_rdoc_files << "README"
-  s.rubyforge_project = "helipad"
-  s.signing_key = "/Volumes/STUFF/gem-certs/gem-private_key.pem"
-  s.cert_chain  = "/Volumes/STUFF/gem-certs/gem-public_cert.pem"
+Gem::Specification.new do |s|
+  s.name = %q{Helipad}
+  s.version = "0.0.1"
+
+  s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
+  s.authors = ["Lonnon Foster"]
+  s.cert_chain = %q{/Volumes/STUFF/gem-certs/gem-public_cert.pem}
+  s.date = %q{2009-03-06}
+  s.email = %q{lonnon.foster@gmail.com}
+  s.extra_rdoc_files = ["README"]
+  s.files = ["lib/helipad.rb", "test/test_helipad.rb", "README"]
+  s.has_rdoc = true
+  s.homepage = %q{http://nyerm.com/helipad}
+  s.rdoc_options = ["--title", "Helipad Documentation", "--main", "README", "--inline-source", "--inline-source", "--charset=UTF-8"]
+  s.require_paths = ["lib"]
+  s.rubyforge_project = %q{helipad}
+  s.rubygems_version = %q{1.3.1}
+  s.signing_key = %q{/Volumes/STUFF/gem-certs/gem-private_key.pem}
+  s.summary = %q{Ruby interface to the excellent Helipad online notepad}
+  s.test_files = ["test/test_helipad.rb"]
+
+  if s.respond_to? :specification_version then
+    current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
+    s.specification_version = 2
+
+    if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
+    else
+    end
+  else
+  end
 end
