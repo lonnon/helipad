@@ -17,9 +17,12 @@ begin
     s.extra_rdoc_files << "README"
     s.rubyforge_project = "helipad"
   end
+  Jeweler::GemcutterTasks.new
+  Jeweler::RubyforgeTasks.new do |rubyforge|
+    rubyforge.doc_task = "rdoc"
+  end
 rescue LoadError
-  puts "Jeweler not available. Install it with:"
-  puts "sudo gem install technicalpickles-jeweler -s http://gems.github.com"
+  puts "Jeweler (or a dependency) not available. Install it with: sudo gem install jeweler"
 end
 
 desc "Remove all generated files"
